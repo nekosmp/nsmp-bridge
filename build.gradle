@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-  include(modImplementation("net.dv8tion:JDA:${project.jda_version}"){
+  include(modServerImplementation("net.dv8tion:JDA:${project.jda_version}"){
     exclude module: 'opus-java'
   })
   //include "com.google.code.findbugs:jsr305:3.0.2"
@@ -23,8 +23,12 @@ dependencies {
   include "com.fasterxml.jackson.core:jackson-annotations:2.13.1"
   include "com.fasterxml.jackson.core:jackson-core:2.13.1"
 
-  include(modImplementation("club.minnced:discord-webhooks:${project:dw_version}"))
+  include(modServerImplementation("club.minnced:discord-webhooks:${project:dw_version}"))
 
   include "com.squareup.okhttp3:okhttp:4.10.0"
   include "org.json:json:20210307"
+}
+
+remapJarServer {
+  addNestedDependencies = true
 }
