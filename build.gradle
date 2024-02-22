@@ -1,0 +1,30 @@
+// Copyright 2024 Atakku <https://atakku.dev>
+
+ext.targets = ['server': []]
+
+apply from: "https://raw.githubusercontent.com/Atakku/gradle/v14/fabric_multitarget.gradle"
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  include(modImplementation("net.dv8tion:JDA:${project.jda_version}"){
+    exclude module: 'opus-java'
+  })
+  //include "com.google.code.findbugs:jsr305:3.0.2"
+  //include "org.jetbrains:annotations:23.0.0"
+  include "com.neovisionaries:nv-websocket-client:2.14"
+  include "com.squareup.okio:okio:3.0.0"
+  include "com.squareup.okio:okio-jvm:3.0.0"
+  include "org.apache.commons:commons-collections4:4.4"
+  include "net.sf.trove4j:trove4j:3.0.3"
+  include "com.fasterxml.jackson.core:jackson-databind:2.13.1"
+  include "com.fasterxml.jackson.core:jackson-annotations:2.13.1"
+  include "com.fasterxml.jackson.core:jackson-core:2.13.1"
+
+  include(modImplementation("club.minnced:discord-webhooks:${project:dw_version}"))
+
+  include "com.squareup.okhttp3:okhttp:4.10.0"
+  include "org.json:json:20210307"
+}

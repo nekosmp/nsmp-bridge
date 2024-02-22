@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "nsmp_discord_bridge",
+  "version": "${version}",
+  "name": "Atakku's Discord Bridge",
+  "authors": [
+    "Atakku"
+  ],
+  "environment": "server",
+  "entrypoints": {
+    "server": [
+      "dev.atakku.nsmp.discord_bridge.server.DiscordBridge"
+    ]
+  },
+  "mixins": [
+    "nsmp_discord_bridge.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": ">=${fapi_version}",
+    "minecraft": "${mc_version}",
+    "java": ">=17"
+  }
+}

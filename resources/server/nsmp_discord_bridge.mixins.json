@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "dev.atakku.nsmp.discord_bridge.server.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [],
+  "mixins": [
+    "MixinPlayerAdvancementTracker",
+    "MixinPlayerManager",
+    "MixinServerPlayerEntity",
+    "MixinServerPlayNetworkHandler"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
