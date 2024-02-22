@@ -1,11 +1,11 @@
-package dev.atakku.nsmp.discord_bridge.mixin;
+package dev.atakku.nsmp.discord_bridge.server.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import dev.atakku.nsmp.discord_bridge.event.PlayerEvents;
+import dev.atakku.nsmp.discord_bridge.server.event.PlayerEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameRules;

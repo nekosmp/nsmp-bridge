@@ -1,4 +1,4 @@
-package dev.atakku.nsmp.discord_bridge.event;
+package dev.atakku.nsmp.discord_bridge.server.event;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

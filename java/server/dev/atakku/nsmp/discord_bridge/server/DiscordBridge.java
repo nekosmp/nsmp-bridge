@@ -1,4 +1,4 @@
-package dev.atakku.nsmp.discord_bridge;
+package dev.atakku.nsmp.discord_bridge.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +8,7 @@ import club.minnced.discord.webhook.external.JDAWebhookClient;
 import club.minnced.discord.webhook.send.AllowedMentions;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import dev.atakku.nsmp.discord_bridge.event.PlayerEvents;
+import dev.atakku.nsmp.discord_bridge.server.event.PlayerEvents;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
