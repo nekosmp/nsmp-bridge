@@ -1,4 +1,4 @@
-package dev.atakku.nsmp.discord_bridge.server.mixin;
+package rs.neko.smp.discbr.server.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import dev.atakku.nsmp.discord_bridge.server.event.PlayerEvents;
+import rs.neko.smp.discbr.server.event.PlayerEvents;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;

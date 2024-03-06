@@ -1,18 +1,25 @@
-package dev.atakku.nsmp.discord_bridge.server;
+package rs.neko.smp.discbr.server;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vdurmont.emoji.EmojiParser;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import club.minnced.discord.webhook.send.AllowedMentions;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import dev.atakku.nsmp.discord_bridge.server.event.PlayerEvents;
+import rs.neko.smp.discbr.server.event.PlayerEvents;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -32,48 +39,39 @@ public class DiscordBridge implements DedicatedServerModInitializer {
   public static final JDAWebhookClient WEBHOOK = new WebhookClientBuilder(System.getenv("DISCORD_WEBHOOK")).buildJDA();
   public static final JDA JDA = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN")).enableIntents(GatewayIntent.MESSAGE_CONTENT).build();
 
-  public static void initJDA(MinecraftServer server) {
-    JDA.addEventListener(new ListenerAdapter() {
-      @Override
-      public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().getIdLong() == WEBHOOK.getId()) return;
-        if (e.getChannel().getId().equals(CHANNEL_ID)) {
-          String name = e.getAuthor().getName();
-          if (!e.getAuthor().getDiscriminator().equals("0000")) {
-            name=name+"#"+e.getAuthor().getDiscriminator();
-          }
-          broadcastMessage(server, name, e.getMessage().getContentRaw());
-        }
-      }
-
-      @Override
-      public void onMessageContextInteraction(MessageContextInteractionEvent e) {
-        //e.getUser()
-        if (e.getName().equals("Whitelist")) {
-          
-          //e.getTarget().getAuthor()
-        }
-      }
-    });
-  }
-
   @Override
   public void onInitializeServer() {
     LOGGER.info("Initializing Atakku's Discord Bridge");
-    ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
-      sendSystemText("🟡 Server is starting");
-    });
+    sendSystemText("🟡 Server is starting");
     ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
       sendSystemText("🟢 Server started");
-      initJDA(server);
+      JDA.addEventListener(new ListenerAdapter() {
+        @Override
+        public void onMessageReceived(MessageReceivedEvent e) {
+          if (e.getAuthor().getIdLong() == WEBHOOK.getId()) return;
+          if (e.getChannel().getId().equals(CHANNEL_ID)) {
+            String text = "";
+            if (e.getMessage().getMessageReference() != null) {
+              Message m = e.getMessage().getMessageReference().getMessage();
+              if (m != null)
+                text += "Replying to " + m.getAuthor().getEffectiveName() + ": ";
+            }
+            text += EmojiParser.parseToAliases(e.getMessage().getContentDisplay());
+            for (Attachment at : e.getMessage().getAttachments()) {
+              text += " [[CICode,url=" + at.getUrl() + ",name=" + at.getFileName() + "]]";
+            }
+            broadcastMessage(server, e.getMessage().getAuthor().getEffectiveName(), text);
+          }
+        }
+      });
     });
     ServerLifecycleEvents.SERVER_STOPPING.register((server) -> {
       sendSystemText("🔴 Server is stopping");
     });
     ServerLifecycleEvents.SERVER_STOPPED.register((server) -> {
       sendSystemText("🛑 Server stopped");
+      JDA.shutdown();
     });
-
     PlayerEvents.PLAYER_JOIN.register((player, firstJoin) -> {
       if (firstJoin) {
         sendSystemEmbed(new EmbedBuilder()
@@ -87,9 +85,8 @@ public class DiscordBridge implements DedicatedServerModInitializer {
     PlayerEvents.PLAYER_LEFT.register((player, reason) -> {
       sendSystemText("📤 **%s** left the game (%s)", player.getEntityName(), reason.getString());
     });
-
     PlayerEvents.PLAYER_MESSAGE.register((player, msg) -> {
-      sendPlayerText(player, msg.getContent().getString());
+      sendPlayerText(player, parseCustom(msg.getContent().getString()));
     });
     PlayerEvents.PLAYER_ADVANCEMENT.register((player, adv) -> {
       AdvancementDisplay disp = adv.getDisplay();
@@ -153,6 +150,18 @@ public class DiscordBridge implements DedicatedServerModInitializer {
 
   private static WebhookMessageBuilder getSystemHook() {
     return new WebhookMessageBuilder().setAllowedMentions(AllowedMentions.none());
+  }
+
+  private static final Pattern p = Pattern.compile(":\\w+:");
+
+  public static String parseCustom(String in) {
+    return p.matcher(in).replaceAll(match -> {
+      String input = match.group();
+      List<RichCustomEmoji> list = JDA.getEmojisByName(input.replaceAll(":", ""), false);
+      if (list.size() > 0)
+        return list.get(0).getAsMention();
+      return input;
+    });
   }
 
   public static void broadcastMessage(MinecraftServer server, String src, String text) {

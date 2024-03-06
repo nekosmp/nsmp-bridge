@@ -9,6 +9,7 @@ repositories {
 }
 
 dependencies {
+  include(modServerImplementation("com.vdurmont:emoji-java:5.1.1"))
   include(modServerImplementation("net.dv8tion:JDA:${project.jda_version}"){
     exclude module: 'opus-java'
   })
