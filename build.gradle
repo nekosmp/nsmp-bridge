@@ -2,7 +2,7 @@
 
 ext.targets = ['server': []]
 
-apply from: "https://raw.githubusercontent.com/Atakku/gradle/v14/fabric_multitarget.gradle"
+apply from: "https://raw.githubusercontent.com/Atakku/gradle/v15/fabric_multitarget.gradle"
 
 repositories {
   mavenCentral()
