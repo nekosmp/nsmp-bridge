@@ -1,12 +1,17 @@
-package rs.neko.smp.discbr.server.event;
+// Copyright 2024 Atakku <https://atakku.dev>
+//
+// This project is dual licensed under MIT and Apache.
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
+package rs.neko.smp.bridge.event;
+
 import net.minecraft.advancement.Advancement;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 
 public final class PlayerEvents {
   public static final Event<PlayerMessage> PLAYER_MESSAGE = EventFactory.createArrayBacked(PlayerMessage.class, callbacks -> (player, msg) -> {

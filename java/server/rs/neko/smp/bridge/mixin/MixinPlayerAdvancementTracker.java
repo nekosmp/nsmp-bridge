@@ -1,15 +1,19 @@
-package rs.neko.smp.discbr.server.mixin;
+// Copyright 2024 Atakku <https://atakku.dev>
+//
+// This project is dual licensed under MIT and Apache.
+
+package rs.neko.smp.bridge.mixin;
+
+import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.PlayerAdvancementTracker;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import rs.neko.smp.discbr.server.event.PlayerEvents;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.PlayerAdvancementTracker;
-import net.minecraft.server.network.ServerPlayerEntity;
+import rs.neko.smp.bridge.event.PlayerEvents;
 
 @Mixin(PlayerAdvancementTracker.class)
 abstract class MixinPlayerAdvancementTracker {

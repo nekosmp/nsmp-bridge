@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "nsmp-discbr",
+  "id": "nsmp-bridge",
   "version": "${mod_version}+${minecraft_version}",
   "name": "${mod_name}",
   "authors": [
@@ -14,11 +14,11 @@
   "environment": "server",
   "entrypoints": {
     "server": [
-      "rs.neko.smp.discbr.server.DiscordBridge"
+      "rs.neko.smp.bridge.Bridge"
     ]
   },
   "mixins": [
-    "nsmp-discbr.mixins.json"
+    "nsmp-bridge.mixins.json"
   ],
   "depends": {
     "fabric-api": ">=${fabric_version}",

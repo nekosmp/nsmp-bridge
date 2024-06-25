@@ -1,16 +1,16 @@
 // Copyright 2024 Atakku <https://atakku.dev>
+//
+// This project is dual licensed under MIT and Apache.
 
-ext.targets = ['server': []]
+apply from: 'https://raw.githubusercontent.com/Atakku/gradle/v42/eufonia_build.gradle'
 
-apply from: "https://raw.githubusercontent.com/Atakku/gradle/v15/fabric_multitarget.gradle"
-
-repositories {
+project(':server').repositories {
   mavenCentral()
 }
 
-dependencies {
-  include(modServerImplementation("com.vdurmont:emoji-java:5.1.1"))
-  include(modServerImplementation("net.dv8tion:JDA:${project.jda_version}"){
+project(':server').dependencies {
+  include(modImplementation("com.vdurmont:emoji-java:5.1.1"))
+  include(modImplementation("net.dv8tion:JDA:$jda_version"){
     exclude module: 'opus-java'
   })
   //include "com.google.code.findbugs:jsr305:3.0.2"
@@ -24,12 +24,12 @@ dependencies {
   include "com.fasterxml.jackson.core:jackson-annotations:2.13.1"
   include "com.fasterxml.jackson.core:jackson-core:2.13.1"
 
-  include(modServerImplementation("club.minnced:discord-webhooks:${project:dw_version}"))
+  include(modImplementation("club.minnced:discord-webhooks:$dw_version"))
 
   include "com.squareup.okhttp3:okhttp:4.10.0"
   include "org.json:json:20210307"
 }
 
-remapJarServer {
+project(':server').remapJar {
   addNestedDependencies = true
 }

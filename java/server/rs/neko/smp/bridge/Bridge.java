@@ -1,19 +1,25 @@
-package rs.neko.smp.discbr.server;
+// Copyright 2024 Atakku <https://atakku.dev>
+//
+// This project is dual licensed under MIT and Apache.
+
+package rs.neko.smp.bridge;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.vdurmont.emoji.EmojiParser;
+import net.minecraft.advancement.AdvancementDisplay;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import club.minnced.discord.webhook.send.AllowedMentions;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import rs.neko.smp.discbr.server.event.PlayerEvents;
+import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -25,15 +31,14 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.advancement.AdvancementDisplay;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import rs.neko.smp.bridge.event.PlayerEvents;
 
-public class DiscordBridge implements DedicatedServerModInitializer {
-  public static final Logger LOGGER = LoggerFactory.getLogger("nsmp_discord_bridge");
+public class Bridge implements DedicatedServerModInitializer {
+  public static final String MOD_ID = "nsmp-bridge";
+  public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
   public static final String CHANNEL_ID = System.getenv("DISCORD_CHANNEL_ID");
   public static final String OWNER = System.getenv("DISCORD_OWNER_ID");
   public static final JDAWebhookClient WEBHOOK = new WebhookClientBuilder(System.getenv("DISCORD_WEBHOOK")).buildJDA();

@@ -19,7 +19,6 @@ classes/
 # vscode
 
 .settings/
-.vscode/
 bin/
 .classpath
 .project
@@ -31,3 +30,13 @@ bin/
 # fabric
 
 .run/
+
+# java
+
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
+
+# generated
+genJava/
