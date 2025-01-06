@@ -2,7 +2,7 @@
 //
 // This project is dual licensed under MIT and Apache.
 
-package rs.neko.smp.bridge.mixin;
+package dev.atakku.fsmp.bridge.mixin;
 
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import rs.neko.smp.bridge.event.PlayerEvents;
+import dev.atakku.fsmp.bridge.event.PlayerEvents;
 
 @Mixin(ServerPlayNetworkHandler.class)
 abstract class MixinServerPlayNetworkHandler {

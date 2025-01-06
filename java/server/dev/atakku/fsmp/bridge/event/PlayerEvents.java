@@ -2,7 +2,7 @@
 //
 // This project is dual licensed under MIT and Apache.
 
-package rs.neko.smp.bridge.event;
+package dev.atakku.fsmp.bridge.event;
 
 import net.minecraft.advancement.Advancement;
 import net.minecraft.entity.damage.DamageSource;

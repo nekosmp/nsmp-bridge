@@ -2,7 +2,7 @@
 //
 // This project is dual licensed under MIT and Apache.
 
-package rs.neko.smp.bridge;
+package dev.atakku.fsmp.bridge;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -33,10 +33,10 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rs.neko.smp.bridge.event.PlayerEvents;
+import dev.atakku.fsmp.bridge.event.PlayerEvents;
 
 public class Bridge implements DedicatedServerModInitializer {
-  public static final String MOD_ID = "nsmp-bridge";
+  public static final String MOD_ID = "fsmp-bridge";
   public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
   public static final String CHANNEL_ID = System.getenv("DISCORD_CHANNEL_ID");
@@ -46,7 +46,7 @@ public class Bridge implements DedicatedServerModInitializer {
 
   @Override
   public void onInitializeServer() {
-    LOGGER.info("Initializing Atakku's Discord Bridge");
+    LOGGER.info("Initializing FSMP Bridge");
     sendSystemText("🟡 Server is starting");
     ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
       sendSystemText("🟢 Server started");

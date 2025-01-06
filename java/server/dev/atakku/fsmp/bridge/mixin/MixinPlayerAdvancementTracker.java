@@ -2,7 +2,7 @@
 //
 // This project is dual licensed under MIT and Apache.
 
-package rs.neko.smp.bridge.mixin;
+package dev.atakku.fsmp.bridge.mixin;
 
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.PlayerAdvancementTracker;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import rs.neko.smp.bridge.event.PlayerEvents;
+import dev.atakku.fsmp.bridge.event.PlayerEvents;
 
 @Mixin(PlayerAdvancementTracker.class)
 abstract class MixinPlayerAdvancementTracker {

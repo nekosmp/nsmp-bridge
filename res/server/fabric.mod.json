@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "nsmp-bridge",
+  "id": "fsmp-bridge",
   "version": "${mod_version}+${minecraft_version}",
   "name": "${mod_name}",
   "authors": [
@@ -14,11 +14,11 @@
   "environment": "server",
   "entrypoints": {
     "server": [
-      "rs.neko.smp.bridge.Bridge"
+      "dev.atakku.fsmp.bridge.Bridge"
     ]
   },
   "mixins": [
-    "nsmp-bridge.mixins.json"
+    "fsmp-bridge.mixins.json"
   ],
   "depends": {
     "fabric-api": ">=${fabric_version}",
