@@ -5,7 +5,6 @@
 package dev.atakku.fsmp.bridge;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import net.minecraft.advancement.AdvancementDisplay;
@@ -173,11 +172,9 @@ public class Bridge implements DedicatedServerModInitializer {
     });
   }
 
-  private static final UUID uuid = UUID.fromString("291c5722-d0ea-4d4d-94af-44e4cbeffb67");
-
   public static void broadcastMessage(MinecraftServer server, String src, String text) {
     for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
-      p.sendChatMessage(SentMessage.of(SignedMessage.ofUnsigned(uuid, text)), false, MessageType.params(MessageType.CHAT, p.getWorld().getRegistryManager(), Text.of(src)));
+      p.sendChatMessage(SentMessage.of(SignedMessage.ofUnsigned(text)), false, MessageType.params(MessageType.CHAT, p.getWorld().getRegistryManager(), Text.of(src)));
     }
   }
 
