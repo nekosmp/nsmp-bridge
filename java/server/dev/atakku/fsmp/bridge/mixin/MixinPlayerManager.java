@@ -23,9 +23,4 @@ abstract class MixinPlayerManager {
   private void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
     PlayerEvents.PLAYER_JOIN.invoker().onPlayerJoin(player, player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(Stats.LEAVE_GAME)) < 1);
   }
-  
-  @Inject(method = "Lnet/minecraft/server/PlayerManager;checkCanJoin(Ljava/net/SocketAddress;Lcom/mojang/authlib/GameProfile;)Lnet/minecraft/text/Text;", at = @At(value = "RETURN", ordinal = 1), cancellable = true)
-  private void  checkCanJoin(CallbackInfoReturnable<Text> cir) {
-    cir.setReturnValue(Text.literal("You are not whitelisted!\nAsk Atakku#2391 on how to get whitelisted!"));
-  }
 }

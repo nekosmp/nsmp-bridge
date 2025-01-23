@@ -66,7 +66,8 @@ public class Bridge implements DedicatedServerModInitializer {
             }
             text += EmojiParser.parseToAliases(e.getMessage().getContentDisplay());
             for (Attachment at : e.getMessage().getAttachments()) {
-              text += " [[CICode,url=" + at.getUrl() + ",name=" + at.getFileName() + "]]";
+              boolean nsfw = at.getFileName().startsWith("SPOILER_");
+              text += " [[CICode,url=" + at.getUrl() + ",name=" + at.getFileName() + ",nsfw=" + nsfw + "]]";
             }
             broadcastMessage(server, e.getMessage().getAuthor().getEffectiveName(), text);
           }
