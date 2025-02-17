@@ -104,6 +104,7 @@ public class Bridge implements DedicatedServerModInitializer {
           Member m = DISCORD_CACHE.get(id);
           if (m != null) {
             String fancy = m.getEffectiveName().replaceAll("[^a-zA-Z0-9_.]", "");
+            System.out.println("Name " + m.getEffectiveName() + " to " + fancy);
             if (fancy.length() > 1) {
               name = fancy;
             }
@@ -135,6 +136,7 @@ public class Bridge implements DedicatedServerModInitializer {
         public void onGuildReady(GuildReadyEvent e) {
           e.getGuild().loadMembers(m -> {
             DISCORD_CACHE.put(m.getId(), m);
+            System.out.println("Found " + m.getId());
           });
         }
 
