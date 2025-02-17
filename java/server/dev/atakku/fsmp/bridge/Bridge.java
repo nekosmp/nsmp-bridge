@@ -59,7 +59,18 @@ public class Bridge implements DedicatedServerModInitializer {
   public static final String CHANNEL_ID = System.getenv("DISCORD_CHANNEL_ID");
   public static final String OWNER = System.getenv("DISCORD_OWNER_ID");
   public static final JDAWebhookClient WEBHOOK = new WebhookClientBuilder(System.getenv("DISCORD_WEBHOOK")).buildJDA();
-  public static final JDA JDA = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN")).enableIntents(GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS)).build();
+  public static final JDA JDA = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN"))
+      .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+      .enableIntents(GatewayIntent.GUILD_MEMBERS)
+      .addEventListeners(new ListenerAdapter() {
+        @Override
+        public void onGuildReady(GuildReadyEvent e) {
+          e.getGuild().loadMembers(m -> {
+            DISCORD_CACHE.put(m.getId(), m);
+          });
+        }
+      })
+      .build();
 
   private static String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.";
 
@@ -77,7 +88,8 @@ public class Bridge implements DedicatedServerModInitializer {
       if (name.length() >= 15) {
         name = name.substring(0, 14);
       }
-      return cacheName(uuid, name + CHARSET.charAt(R.nextInt(CHARSET.length())) + CHARSET.charAt(R.nextInt(CHARSET.length())), id);
+      return cacheName(uuid,
+          name + CHARSET.charAt(R.nextInt(CHARSET.length())) + CHARSET.charAt(R.nextInt(CHARSET.length())), id);
     }
     NAME_CACHE.put(uuid, name);
     ID_CACHE.put(uuid, id);
@@ -101,7 +113,6 @@ public class Bridge implements DedicatedServerModInitializer {
           Member m = DISCORD_CACHE.get(id);
           if (m != null) {
             String fancy = m.getEffectiveName().replaceAll("[^a-zA-Z0-9_.]", "");
-            System.out.println("Name " + m.getEffectiveName() + " to " + fancy);
             if (fancy.length() > 1) {
               name = fancy;
             }
@@ -129,15 +140,6 @@ public class Bridge implements DedicatedServerModInitializer {
     ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
       sendSystemText("🟢 Server started");
       JDA.addEventListener(new ListenerAdapter() {
-        @Override
-        public void onGuildReady(GuildReadyEvent e) {
-          System.out.println("Guild ready: " + e.getGuild().getId());
-          e.getGuild().loadMembers(m -> {
-            DISCORD_CACHE.put(m.getId(), m);
-            System.out.println("Found " + m.getId());
-          });
-        }
-
         @Override
         public void onMessageReceived(MessageReceivedEvent e) {
           if (e.getAuthor().getIdLong() == WEBHOOK.getId())
