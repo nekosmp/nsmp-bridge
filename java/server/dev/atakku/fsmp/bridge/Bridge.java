@@ -59,9 +59,7 @@ public class Bridge implements DedicatedServerModInitializer {
   public static final String CHANNEL_ID = System.getenv("DISCORD_CHANNEL_ID");
   public static final String OWNER = System.getenv("DISCORD_OWNER_ID");
   public static final JDAWebhookClient WEBHOOK = new WebhookClientBuilder(System.getenv("DISCORD_WEBHOOK")).buildJDA();
-  public static final JDA JDA = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN"))
-      .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-      .enableIntents(GatewayIntent.GUILD_MEMBERS).build();
+  public static final JDA JDA = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN")).enableIntents(GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS)).build();
 
   private static String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.";
 
