@@ -77,8 +77,7 @@ public class Bridge implements DedicatedServerModInitializer {
       if (name.length() >= 15) {
         name = name.substring(0, 14);
       }
-      return cacheName(uuid,
-          name + CHARSET.charAt(R.nextInt(CHARSET.length())) + CHARSET.charAt(R.nextInt(CHARSET.length())), id);
+      return cacheName(uuid, name + CHARSET.charAt(R.nextInt(CHARSET.length())) + CHARSET.charAt(R.nextInt(CHARSET.length())), id);
     }
     NAME_CACHE.put(uuid, name);
     ID_CACHE.put(uuid, id);
@@ -132,6 +131,7 @@ public class Bridge implements DedicatedServerModInitializer {
       JDA.addEventListener(new ListenerAdapter() {
         @Override
         public void onGuildReady(GuildReadyEvent e) {
+          System.out.println("Guild ready: " + e.getGuild().getId());
           e.getGuild().loadMembers(m -> {
             DISCORD_CACHE.put(m.getId(), m);
             System.out.println("Found " + m.getId());
