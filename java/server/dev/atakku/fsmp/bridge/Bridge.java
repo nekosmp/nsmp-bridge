@@ -52,7 +52,6 @@ import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
 
-
 public class Bridge implements DedicatedServerModInitializer {
   public static final String MOD_ID = "fsmp-bridge";
   public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -60,7 +59,9 @@ public class Bridge implements DedicatedServerModInitializer {
   public static final String CHANNEL_ID = System.getenv("DISCORD_CHANNEL_ID");
   public static final String OWNER = System.getenv("DISCORD_OWNER_ID");
   public static final JDAWebhookClient WEBHOOK = new WebhookClientBuilder(System.getenv("DISCORD_WEBHOOK")).buildJDA();
-  public static final JDA JDA = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN")).enableIntents(GatewayIntent.MESSAGE_CONTENT).build();
+  public static final JDA JDA = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN"))
+      .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+      .enableIntents(GatewayIntent.GUILD_MEMBERS).build();
 
   private static String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.";
 
@@ -78,7 +79,8 @@ public class Bridge implements DedicatedServerModInitializer {
       if (name.length() >= 15) {
         name = name.substring(0, 14);
       }
-      return cacheName(uuid, name + CHARSET.charAt(R.nextInt(CHARSET.length())) + CHARSET.charAt(R.nextInt(CHARSET.length())), id);
+      return cacheName(uuid,
+          name + CHARSET.charAt(R.nextInt(CHARSET.length())) + CHARSET.charAt(R.nextInt(CHARSET.length())), id);
     }
     NAME_CACHE.put(uuid, name);
     ID_CACHE.put(uuid, id);
@@ -95,10 +97,10 @@ public class Bridge implements DedicatedServerModInitializer {
         conn.setRequestMethod("GET");
         if (conn.getResponseCode() == 200) {
           String[] data = IOUtils.toString(conn.getInputStream(), "UTF-8").split("\n");
-          
+
           String name = data[0];
           String id = data[1];
-          
+
           Member m = DISCORD_CACHE.get(id);
           if (m != null) {
             String fancy = m.getEffectiveName().replaceAll("[^a-zA-Z0-9_.]", "");
@@ -131,15 +133,15 @@ public class Bridge implements DedicatedServerModInitializer {
       JDA.addEventListener(new ListenerAdapter() {
         @Override
         public void onGuildReady(GuildReadyEvent e) {
-          e.getGuild().loadMembers().onSuccess(l -> {
-            for (Member m: l) {
-              DISCORD_CACHE.put(m.getId(), m);
-            }
+          e.getGuild().loadMembers(m -> {
+            DISCORD_CACHE.put(m.getId(), m);
           });
         }
+
         @Override
         public void onMessageReceived(MessageReceivedEvent e) {
-          if (e.getAuthor().getIdLong() == WEBHOOK.getId()) return;
+          if (e.getAuthor().getIdLong() == WEBHOOK.getId())
+            return;
           if (e.getChannel().getId().equals(CHANNEL_ID)) {
             String text = "";
             if (e.getMessage().getMessageReference() != null) {
@@ -199,13 +201,15 @@ public class Bridge implements DedicatedServerModInitializer {
     });
     PlayerEvents.PLAYER_DEATH.register((player, source) -> {
       Text textDM = player.getDamageTracker().getDeathMessage();
-      //if (textDM instanceof TranslatableText) {
-      //  TranslatableText tt_dm = (TranslatableText) textDM;
-      //  List<String> args = Arrays.stream(tt_dm.getArgs()).map(a -> String.format("**%s**", a instanceof Text ? ((Text) a).getString() : a.toString())).collect(Collectors.toList());
-      //  textDM = Text.translatable(tt_dm.getKey(), args.toArray());
-      //}
+      // if (textDM instanceof TranslatableText) {
+      // TranslatableText tt_dm = (TranslatableText) textDM;
+      // List<String> args = Arrays.stream(tt_dm.getArgs()).map(a ->
+      // String.format("**%s**", a instanceof Text ? ((Text) a).getString() :
+      // a.toString())).collect(Collectors.toList());
+      // textDM = Text.translatable(tt_dm.getKey(), args.toArray());
+      // }
       Map<String, UUID> temp = new Object2ObjectArrayMap<>();
-      for(Map.Entry<UUID, String> entry : NAME_CACHE.entrySet()) {
+      for (Map.Entry<UUID, String> entry : NAME_CACHE.entrySet()) {
         temp.put(entry.getValue(), entry.getKey());
       }
 
@@ -274,7 +278,8 @@ public class Bridge implements DedicatedServerModInitializer {
 
   public static void broadcastMessage(MinecraftServer server, String src, String text) {
     for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
-      p.sendChatMessage(SentMessage.of(SignedMessage.ofUnsigned(text)), false, MessageType.params(MessageType.CHAT, p.getWorld().getRegistryManager(), Text.of(src)));
+      p.sendChatMessage(SentMessage.of(SignedMessage.ofUnsigned(text)), false,
+          MessageType.params(MessageType.CHAT, p.getWorld().getRegistryManager(), Text.of(src)));
     }
   }
 
