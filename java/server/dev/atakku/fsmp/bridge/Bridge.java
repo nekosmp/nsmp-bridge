@@ -5,7 +5,6 @@
 package dev.atakku.fsmp.bridge;
 
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +28,17 @@ import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.vdurmont.emoji.EmojiParser;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -93,7 +96,19 @@ public class Bridge implements DedicatedServerModInitializer {
         conn.setRequestMethod("GET");
         if (conn.getResponseCode() == 200) {
           String[] data = IOUtils.toString(conn.getInputStream(), "UTF-8").split("\n");
-          return cacheName(uuid, data[0], data[1]);
+          
+          String name = data[0];
+          String id = data[1];
+          
+          Member m = DISCORD_CACHE.get(id);
+          if (m != null) {
+            String fancy = m.getEffectiveName().replaceAll("[^a-zA-Z0-9_.]", "");
+            if (fancy.length() > 1) {
+              name = fancy;
+            }
+          }
+
+          return cacheName(uuid, name, id);
         }
       } catch (Exception ex) {
         Bridge.LOGGER.error(ex.getMessage());
@@ -106,6 +121,8 @@ public class Bridge implements DedicatedServerModInitializer {
     return NAME_CACHE.get(uuid);
   }
 
+  private static Object2ObjectOpenHashMap<String, Member> DISCORD_CACHE = new Object2ObjectOpenHashMap<>();
+
   @Override
   public void onInitializeServer() {
     LOGGER.info("Initializing FSMP Bridge");
@@ -113,6 +130,14 @@ public class Bridge implements DedicatedServerModInitializer {
     ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
       sendSystemText("🟢 Server started");
       JDA.addEventListener(new ListenerAdapter() {
+        @Override
+        public void onGuildReady(@Nonnull GuildReadyEvent e) {
+          e.getGuild().loadMembers().onSuccess(l -> {
+            for (Member m: l) {
+              DISCORD_CACHE.put(m.getId(), m);
+            }
+          });
+        }
         @Override
         public void onMessageReceived(MessageReceivedEvent e) {
           if (e.getAuthor().getIdLong() == WEBHOOK.getId()) return;
