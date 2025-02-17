@@ -38,6 +38,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -68,6 +70,14 @@ public class Bridge implements DedicatedServerModInitializer {
           e.getGuild().loadMembers(m -> {
             DISCORD_CACHE.put(m.getId(), m);
           });
+        }
+        
+        public void onGuildMemberUpdate(GuildMemberUpdateEvent e) {
+          DISCORD_CACHE.put(e.getMember().getId(), e.getMember());
+        }
+
+        public void onGuildMemberJoin(GuildMemberJoinEvent e) {
+          DISCORD_CACHE.put(e.getMember().getId(), e.getMember());
         }
       })
       .build();
