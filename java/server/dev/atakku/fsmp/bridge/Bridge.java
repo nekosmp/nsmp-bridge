@@ -4,7 +4,12 @@
 
 package dev.atakku.fsmp.bridge;
 
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import net.minecraft.advancement.AdvancementDisplay;
@@ -23,6 +28,8 @@ import club.minnced.discord.webhook.send.AllowedMentions;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.vdurmont.emoji.EmojiParser;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -38,6 +45,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dev.atakku.fsmp.bridge.event.PlayerEvents;
 
+import java.net.URL;
+import java.util.Random;
+
+import org.apache.commons.io.IOUtils;
+
+
 public class Bridge implements DedicatedServerModInitializer {
   public static final String MOD_ID = "fsmp-bridge";
   public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -46,6 +59,52 @@ public class Bridge implements DedicatedServerModInitializer {
   public static final String OWNER = System.getenv("DISCORD_OWNER_ID");
   public static final JDAWebhookClient WEBHOOK = new WebhookClientBuilder(System.getenv("DISCORD_WEBHOOK")).buildJDA();
   public static final JDA JDA = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN")).enableIntents(GatewayIntent.MESSAGE_CONTENT).build();
+
+  private static String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.";
+
+  private static HashMap<UUID, String> NAME_CACHE = new HashMap<>();
+  private static HashMap<UUID, String> ID_CACHE = new HashMap<>();
+  private static Random R = new Random();
+
+  private static String cacheName(UUID uuid, String name, String id) {
+    if (name.length() > 16) {
+      name = name.substring(0, 16);
+    }
+    NAME_CACHE.remove(uuid);
+    ID_CACHE.remove(uuid);
+    if (NAME_CACHE.containsValue(name)) {
+      if (name.length() >= 15) {
+        name = name.substring(0, 14);
+      }
+      return cacheName(uuid, name + CHARSET.charAt(R.nextInt(CHARSET.length())) + CHARSET.charAt(R.nextInt(CHARSET.length())), id);
+    }
+    NAME_CACHE.put(uuid, name);
+    ID_CACHE.put(uuid, id);
+    return NAME_CACHE.get(uuid);
+  }
+
+  public static String getUserData(UUID uuid, boolean force) {
+    if (uuid == null)
+      return null;
+    if (force || !NAME_CACHE.containsKey(uuid)) {
+      try {
+        URL url = new URL("https://link.neko.rs/whitelist?uuid=" + uuid.toString());
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        if (conn.getResponseCode() == 200) {
+          String[] data = IOUtils.toString(conn.getInputStream(), "UTF-8").split("\n");
+          return cacheName(uuid, data[0], data[1]);
+        }
+      } catch (Exception ex) {
+        Bridge.LOGGER.error(ex.getMessage());
+        ex.printStackTrace();
+      }
+      if (!NAME_CACHE.containsKey(uuid)) {
+        NAME_CACHE.put(uuid, null);
+      }
+    }
+    return NAME_CACHE.get(uuid);
+  }
 
   @Override
   public void onInitializeServer() {
@@ -84,15 +143,15 @@ public class Bridge implements DedicatedServerModInitializer {
     PlayerEvents.PLAYER_JOIN.register((player, firstJoin) -> {
       if (firstJoin) {
         sendSystemEmbed(new EmbedBuilder()
-            .setTitle(String.format("%s joined the game", player.getEntityName()))
+            .setTitle(String.format("%s joined the game", pingOrFallback(player)))
             .setThumbnail(minotar(player, "armor/bust", 128))
             .setColor(0x8BC34A));
       } else {
-        sendSystemText("📥 **%s** joined the game (%s)", player.getEntityName(), getPlayTime(player));
+        sendSystemText("📥 **%s** joined the game (%s)", pingOrFallback(player), getPlayTime(player));
       }
     });
     PlayerEvents.PLAYER_LEFT.register((player, reason) -> {
-      sendSystemText("📤 **%s** left the game (%s)", player.getEntityName(), reason.getString());
+      sendSystemText("📤 **%s** left the game (%s)", pingOrFallback(player), reason.getString());
     });
     PlayerEvents.PLAYER_MESSAGE.register((player, msg) -> {
       sendPlayerText(player, parseCustom(msg.getContent().getString()));
@@ -101,15 +160,15 @@ public class Bridge implements DedicatedServerModInitializer {
       AdvancementDisplay disp = adv.getDisplay();
       switch (disp.getFrame()) {
         case TASK:
-          sendSystemText("✨ **%s** has made the advancement **[%s]**", player.getEntityName(),
+          sendSystemText("✨ **%s** has made the advancement **[%s]**", pingOrFallback(player),
               disp.getTitle().getString());
           break;
         case CHALLENGE:
-          sendSystemText("🎉 **%s** has completed the challenge **[%s]**", player.getEntityName(),
+          sendSystemText("🎉 %s has completed the challenge **[%s]**", pingOrFallback(player),
               disp.getTitle().getString());
           break;
         case GOAL:
-          sendSystemText("🎊 **%s** has reached the goal **[%s]**", player.getEntityName(),
+          sendSystemText("🎊 **%s** has reached the goal **[%s]**", pingOrFallback(player),
               disp.getTitle().getString());
           break;
       }
@@ -121,8 +180,24 @@ public class Bridge implements DedicatedServerModInitializer {
       //  List<String> args = Arrays.stream(tt_dm.getArgs()).map(a -> String.format("**%s**", a instanceof Text ? ((Text) a).getString() : a.toString())).collect(Collectors.toList());
       //  textDM = Text.translatable(tt_dm.getKey(), args.toArray());
       //}
-      sendSystemText("💀 %s", textDM.getString());
+      Map<String, UUID> temp = new Object2ObjectArrayMap<>();
+      for(Map.Entry<UUID, String> entry : NAME_CACHE.entrySet()) {
+        temp.put(entry.getValue(), entry.getKey());
+      }
+
+      ObjectArrayList<String> words = new ObjectArrayList<>(textDM.getString().split(" "));
+      words.replaceAll(n -> temp.get(n) != null ? pingOrFallback(temp.get(n), n) : n);
+      sendSystemText("💀 %s", String.join(" ", words));
     });
+  }
+
+  private static String pingOrFallback(UUID uuid, String fallback) {
+    String id = ID_CACHE.get(uuid);
+    return id != null ? "<@" + id + ">" : "**" + fallback + "**";
+  }
+
+  private static String pingOrFallback(ServerPlayerEntity e) {
+    return pingOrFallback(e.getUuid(), e.getEntityName());
   }
 
   private static String getPlayTime(ServerPlayerEntity player) {

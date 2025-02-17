@@ -1,0 +1,2 @@
+# FemSMP Discord bridge
+- Req
