@@ -30,7 +30,6 @@ import com.vdurmont.emoji.EmojiParser;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -131,7 +130,7 @@ public class Bridge implements DedicatedServerModInitializer {
       sendSystemText("🟢 Server started");
       JDA.addEventListener(new ListenerAdapter() {
         @Override
-        public void onGuildReady(@Nonnull GuildReadyEvent e) {
+        public void onGuildReady(GuildReadyEvent e) {
           e.getGuild().loadMembers().onSuccess(l -> {
             for (Member m: l) {
               DISCORD_CACHE.put(m.getId(), m);
