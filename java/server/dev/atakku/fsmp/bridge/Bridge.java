@@ -122,7 +122,7 @@ public class Bridge implements DedicatedServerModInitializer {
 
           Member m = DISCORD_CACHE.get(id);
           if (m != null) {
-            String fancy = m.getEffectiveName().replaceAll("[^a-zA-Z0-9_.]", "");
+            String fancy = m.getEffectiveName().replace(" ", "_").replace("__", "_").replaceAll("[^a-zA-Z0-9_.]", "");
             if (fancy.length() > 1) {
               name = fancy;
             }
